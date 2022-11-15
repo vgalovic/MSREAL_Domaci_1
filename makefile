@@ -1,7 +1,7 @@
 sources=$(wildcard *.c)
 objs=$(sources:.c=.o)
 # Ovde postaviti ime izvrsnog fajla: result=ime
-result=button_test
+result=Domaci
 
 all: $(result)
 $(result): $(objs)

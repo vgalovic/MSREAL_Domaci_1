@@ -5,9 +5,9 @@
 #include <unistd.h>
 
 //definisane funkcije
-int led_f(short led_pos);
-int switch_f();
-int button_f(short sw, short led_pos);
+short led_f(short led_pos);
+short switch_f();
+short button_f(short sw, short led_pos);
 
 int main(){  
 
@@ -44,7 +44,7 @@ int main(){
   }	
 }
 
-int led_f(short led_pos){
+short led_f(short led_pos){
   FILE* fp;
   
   //upis u fajl /dev/led
@@ -63,7 +63,7 @@ int led_f(short led_pos){
   return 0;
 }
 
-int switch_f(){
+short switch_f(){
   FILE *fp;
   char *str;
   char chr1, chr2;
@@ -99,7 +99,7 @@ int switch_f(){
     return 3;
 }
 
-int button_f(short sw, short led_pos){
+short button_f(short sw, short led_pos){
   FILE *fp;
   char *str;
   char chr1, chr2, chr3, chr4;

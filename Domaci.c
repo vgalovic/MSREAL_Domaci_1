@@ -5,14 +5,14 @@
 #include <unistd.h>
 
 //definisane funkcije
-int led_f(int led_pos);
+int led_f(short led_pos);
 int switch_f();
-int button_f(int sw, int led_pos);
+int button_f(short sw, short led_pos);
 
 int main(){  
 
-  int sw = 0; //broj za koliko se pomera pozicija led u zavisnosti od pozicija sviceva
-  int led_pos = 1; //pozicija led koja je upaljena
+  short sw = 0; //broj za koliko se pomera pozicija led u zavisnosti od pozicija sviceva
+  short led_pos = 1; //pozicija led koja je upaljena
   long int per = 20000L; //period
 
   while(1){
@@ -44,7 +44,7 @@ int main(){
   }	
 }
 
-int led_f(int led_pos){
+int led_f(short led_pos){
   FILE* fp;
   
   //upis u fajl /dev/led
@@ -99,12 +99,13 @@ int switch_f(){
     return 3;
 }
 
-it button_f(int sw, int led_pos){
+int button_f(short sw, short led_pos){
   FILE *fp;
   char *str;
   char chr1, chr2, chr3, chr4;
   size_t nob = 6; // number of byts
   short rt = 0; //Vraca vrednos koja se upisuje u led_pos
+  short i;
   
   //Citanje vrednosti sa tastera
   fp = fopen("/dev/button", "r");
@@ -136,7 +137,7 @@ it button_f(int sw, int led_pos){
   else if(chr2 == 1){ //Ako je pritisnut taster BUTTON2, ukljucena dioda na poziciji led_pos ce se pomeriti za sw mesta u levo
     rt = led_pos;
 
-    for(int i = 0; i < sw; i++){
+    for(i = 0; i < sw; i++){
       if(rt == 8)
 	rt = 1;
       else
@@ -147,7 +148,7 @@ it button_f(int sw, int led_pos){
   else if(chr3 == 1){ //Ako je pritisnut taster BUTTON1, ukljucena dioda na poziciji led_pos ce se pomeriti za sw mesta u desno
     rt = led_pos;
 
-    for(int i = 0; i < sw; i++){
+    for(i = 0; i < sw; i++){
       if(rt == 1)
 	rt = 8;
       else

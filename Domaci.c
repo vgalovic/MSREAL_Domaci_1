@@ -23,7 +23,7 @@ int main(){
     usleep(per);
 
     //pokrece funkciju switch_f i cita u kojim polozajima se nalaze SWITCH0 i SWITCH1
-    sw = switch();
+    sw = switch_f();
     if(sw == -1) //prvra da li ima problema pri radu funkcije
       return -1;
 

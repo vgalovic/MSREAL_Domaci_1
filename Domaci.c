@@ -13,15 +13,17 @@ int main(){
 
   short sw = 0; //broj za koliko se pomera pozicija led u zavisnosti od pozicija sviceva
   short led_pos = 1; //pozicija led koja je upaljena
+  short led_pos_pr = 0;
   long int per = 20000L; //period
 
   while(1){
-    printf("led_pos %d", led_pos);
     
     //Pokrece funkciju led_f i upisuje koja dioda treba da bude upaljena u zadatom trenutku
-    if(led_f(led_pos) == -1) //prvra da li ima problema pri radu funkcije
-      return -1;
-    
+    if(led_pos != led_po_pr){
+      if(led_f(led_pos) == -1) //prvra da li ima problema pri radu funkcije
+	return -1;
+      led_pos_pr = led_pos;
+    }
     usleep(per);
 
     //pokrece funkciju switch_f i cita u kojim polozajima se nalaze SWITCH0 i SWITCH1

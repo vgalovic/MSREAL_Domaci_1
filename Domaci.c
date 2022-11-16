@@ -5,9 +5,9 @@
 #include <unistd.h>
 
 //definisane funkcije
-short led_f(short led_pos);
-short switch_f();
-short button_f(short sw, short led_pos);
+int led_f(short led_pos);
+int switch_f();
+int button_f(short sw, short led_pos);
 
 int main(){  
 
@@ -16,10 +16,12 @@ int main(){
   long int per = 20000L; //period
 
   while(1){
+    printf("led_pos %d", led_pos);
+    
     //Pokrece funkciju led_f i upisuje koja dioda treba da bude upaljena u zadatom trenutku
     if(led_f(led_pos) == -1) //prvra da li ima problema pri radu funkcije
       return -1;
-
+    
     usleep(per);
 
     //pokrece funkciju switch_f i cita u kojim polozajima se nalaze SWITCH0 i SWITCH1
@@ -44,7 +46,7 @@ int main(){
   }	
 }
 
-short led_f(short led_pos){
+int led_f(short led_pos){
   FILE* fp;
   
   //upis u fajl /dev/led
@@ -54,7 +56,7 @@ short led_f(short led_pos){
     return -1;
   }
 
-  fprintf(fp, "0x%d", led_pos);
+  fprintf(fp, "0x%x", led_pos);
   if(fclose(fp)){
     puts("Problem pri zatvaranju /dev/led");
     return -1;
@@ -63,7 +65,7 @@ short led_f(short led_pos){
   return 0;
 }
 
-short switch_f(){
+int switch_f(){
   FILE *fp;
   char *str;
   char chr1, chr2;
@@ -99,12 +101,12 @@ short switch_f(){
     return 3;
 }
 
-short button_f(short sw, short led_pos){
+int button_f(short sw, short led_pos){
   FILE *fp;
   char *str;
   char chr1, chr2, chr3, chr4;
   size_t nob = 6; // number of byts
-  short rt = 0; //Vraca vrednos koja se upisuje u led_pos
+  short rt = led_pos; //Vraca vrednos koja se upisuje u led_pos
   short i;
   
   //Citanje vrednosti sa tastera
@@ -135,7 +137,6 @@ short button_f(short sw, short led_pos){
     rt = 8;
 
   else if(chr2 == 1){ //Ako je pritisnut taster BUTTON2, ukljucena dioda na poziciji led_pos ce se pomeriti za sw mesta u levo
-    rt = led_pos;
 
     for(i = 0; i < sw; i++){
       if(rt == 8)
@@ -146,7 +147,6 @@ short button_f(short sw, short led_pos){
   }
   
   else if(chr3 == 1){ //Ako je pritisnut taster BUTTON1, ukljucena dioda na poziciji led_pos ce se pomeriti za sw mesta u desno
-    rt = led_pos;
 
     for(i = 0; i < sw; i++){
       if(rt == 1)

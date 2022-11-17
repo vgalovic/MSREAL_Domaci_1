@@ -5,26 +5,30 @@
 #include <unistd.h>
 
 //definisane funkcije
-int led_f(int led_pos);
+int led_f();
 int switch_f();
-int *  button_f(int sw, int pos[2]);
+int button_f(short sw, short button_pos);
+
+//globalnae variable
+short led_pos = 1; //pozicija led koja je upaljena
 
 int main(){  
 
-  int sw = 0; //broj za koliko se pomera pozicija led u zavisnosti od pozicija sviceva
-  int pos[2] = {1,0}; //pozicija led koja je upaljena
-  int *point;
-  short button_presed = 0;
+  short sw = 0; //broj za koliko se pomera pozicija led u zavisnosti od pozicija sviceva
+  short button_pos = 4;
+  short button_pos_pr = 0;
   long int per = 20000L; //period
 
   while(1){
+    printf("led_pos %d", led_pos);
     
     //Pokrece funkciju led_f i upisuje koja dioda treba da bude upaljena u zadatom trenutku
-    if(pos[1] != button_presed){
-      if(led_f(pos[0]) == -1) //prvra da li ima problema pri radu funkcije
-	return -1;
-      button_presed = pos[1];
+    if(button_pos != button_pos_pr){
+    if(led_f(led_pos) == -1) //prvra da li ima problema pri radu funkcije
+      return -1;
+    button_pos_pr = button_pos;
     }
+    
     usleep(per);
 
     //pokrece funkciju switch_f i cita u kojim polozajima se nalaze SWITCH0 i SWITCH1
@@ -33,16 +37,14 @@ int main(){
       return -1;
 
     //pokrece funkciju button_f i cita da li je neki taster pritisnut
-    point = button_f(sw, pos);
-    *(point) = pos[0];
-    *(point +1) = pos[1];
-    if(pos[0] == -1) //prvra da li ima problema pri radu funkcije
+    led_pos = button_f(sw, led_pos); 
+    if(led_pos == -1) //prvra da li ima problema pri radu funkcije
       return -1;
     
-    if(pos[0] == -2){ //Ako su BUTTON0 i BUTTON3 pritisnuti u isto vreme, program se gasi
+    if(led_pos == -2){ //Ako su BUTTON0 i BUTTON3 pritisnuti u isto vreme, program se gasi
       //Ugasi sve diode
-      pos[0] = 0;
-      if(led_f(pos[0]) == -1) //prvra da li ima problema pri radu funkcije
+      led_pos = 0;
+      if(led_f(led_pos) == -1) //prvra da li ima problema pri radu funkcije
       return -1;
        
       puts("Uspesno ste izasli iz programa!");
@@ -51,7 +53,7 @@ int main(){
   }	
 }
 
-int led_f(int led_pos){
+int led_f(){
   FILE* fp;
   
   //upis u fajl /dev/led
@@ -106,22 +108,18 @@ int switch_f(){
     return 3;
 }
 
-int *  button_f(int sw, int pos[2]){
+int button_f(short sw, short  button_pos){
   FILE *fp;
   char *str;
   char chr1, chr2, chr3, chr4;
   size_t nob = 6; // number of byts
-  static int rt[2]; //Vraca vrednos koja se upisuje u led_pos
   short i;
-  rt[0] = pos[0];
   
   //Citanje vrednosti sa tastera
   fp = fopen("/dev/button", "r");
   if(fp == NULL){
     puts("Problem pri otvaranju /dev/button");
-    rt[0] = -1;
-    rt[1] = 5;
-    return rt;
+    return -1;
   }
 
   str = (char *)malloc(nob +1);
@@ -129,9 +127,7 @@ int *  button_f(int sw, int pos[2]){
 
   if(fclose(fp)){
     puts("problem pri zatvaranju /dev/button");
-    rt[0] = -1;
-    rt[1] = 5;
-    return rt;
+    return -1;
   }
 
   chr1 = str[2] -48;
@@ -141,41 +137,40 @@ int *  button_f(int sw, int pos[2]){
   free(str);
 
   if((chr1 == 1) && (chr4 == 1)){ //Ako su BUTTON0 i BUTTON3 pritisnuti u isto vreme, program se gasi
-    rt[0] =-2;
-    rt[1] =5;
+    return -2;
   }
   
-  if(chr1 == 1){ //Ako je pritisnut taster BUTTON3, pali se dioda LED4
-    rt[0] = 8;
-    rt[1] = 1;
+  if(chr1 == 1){ //Ako je pritisnut taster BUTTON4, pali se dioda LED4
+    led_pos = 8;
+    return 1;
   }
 
   else if(chr2 == 1){ //Ako je pritisnut taster BUTTON2, ukljucena dioda na poziciji led_pos ce se pomeriti za sw mesta u levo
-    rt[1] = 2;
-    
     for(i = 0; i < sw; i++){
-      if(rt[0] == 8)
-	rt[0] = 1;
+      if(led_pos == 8)
+	led_pos = 1;
       else
-	rt[0] = rt[0] *2;
+	led_pos = led_pos *2;
     }
+
+    return 2;
   }
-  
+
   else if(chr3 == 1){ //Ako je pritisnut taster BUTTON1, ukljucena dioda na poziciji led_pos ce se pomeriti za sw mesta u desno
-    rt[1] = 3;
-    
+
     for(i = 0; i < sw; i++){
-      if(rt[0] == 1)
-	rt[0] = 8;
+      if(led_pos == 1)
+	led_pos = 8;
       else
-	rt[0] = rt[0] /2;
+	led_pos = led_pos /2;
     }
+
+    return 3;
   }
   
   else if(chr4 == 1){ //Ako je pritisnut taster BUTTON0, pali se dioda LED0
-    rt[0] = 1;
-    rt[1] = 4;
+    led_pos = 1;
+    return 4;
   }
-
-  return rt;
+  return button_pos;
 }

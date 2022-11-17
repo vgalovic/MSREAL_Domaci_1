@@ -24,9 +24,9 @@ int main(){
     
     //Pokrece funkciju led_f i upisuje koja dioda treba da bude upaljena u zadatom trenutku
     if(button_pos != button_pos_pr){
-    if(led_f(led_pos) == -1) //prvra da li ima problema pri radu funkcije
-      return -1;
-    button_pos_pr = button_pos;
+    	if(led_f(led_pos) == -1) //prvra da li ima problema pri radu funkcije
+      	  return -1;
+    	button_pos_pr = button_pos;
     }
     
     usleep(per);

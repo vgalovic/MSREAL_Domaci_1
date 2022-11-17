@@ -37,15 +37,15 @@ int main(){
       return -1;
 
     //pokrece funkciju button_f i cita da li je neki taster pritisnut
-    led_pos = button_f(sw, led_pos); 
-    if(led_pos == -1) //prvra da li ima problema pri radu funkcije
+    button_pos = button_f(sw, button_pos); 
+    if(button_pos == -1) //prvra da li ima problema pri radu funkcije
       return -1;
     
-    if(led_pos == -2){ //Ako su BUTTON0 i BUTTON3 pritisnuti u isto vreme, program se gasi
+    if(button_pos == -2){ //Ako su BUTTON0 i BUTTON3 pritisnuti u isto vreme, program se gasi
       //Ugasi sve diode
       led_pos = 0;
-      if(led_f(led_pos) == -1) //prvra da li ima problema pri radu funkcije
-      return -1;
+      
+      led_f();
        
       puts("Uspesno ste izasli iz programa!");
       return 0; // Ako nije prethodno bilo ikakvih problema, program se uspesno zatvara
